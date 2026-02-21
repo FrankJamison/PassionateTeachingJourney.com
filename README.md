@@ -1,166 +1,185 @@
-# Passionate Teaching Journey (2024)
+# PassionateTeachingJourney.com
 
-I built **Passionate Teaching Journey** as a WordPress site that functions as both a long-form blog and a professional portfolio. This repo is set up as a portfolio artifact for employers, recruiters, and developers: it includes the site’s WordPress codebase plus a database dump so the site can be evaluated as a complete, realistic implementation (content structure, theme configuration, plugin stack, and performance/SEO decisions).
+This repository is a **self-contained WordPress snapshot** for PassionateTeachingJourney.com: WordPress core + `wp-content` + a database dump so the site can be reproduced locally with realistic content, theme configuration, and plugin settings.
 
-## At a glance
+It’s intentionally developer-friendly: you should be able to clone, import the DB, and boot the site without running the WordPress installer.
 
-- I set up a full WordPress environment that can be reproduced locally from this repository.
-- I selected and configured a modern theme system (Yuki + Yuki Blogger) to support a content-heavy blog with flexible layout control.
-- I integrated the typical “real site” capabilities: SEO, analytics, forms, consent, and caching/performance.
-- I maintained a staging snapshot (`staging/`) to support safe iteration and theme experimentation.
+## Quickstart (Windows, XAMPP)
 
-## Tech stack
+### Prerequisites
 
-- WordPress (PHP)
-- MariaDB / MySQL
-- Local development (Windows): Apache + MySQL via XAMPP
-- Caching/performance: LiteSpeed Cache (optionally with object cache)
+- Apache + PHP + MySQL/MariaDB (e.g., XAMPP)
+- A local virtual host **or** a path-based Apache setup
 
-## Repository layout (what matters)
+### 1) Start services
 
-This repository contains two WordPress installs:
+Start **Apache** and **MySQL** in XAMPP.
 
-- Root install: the primary local copy
-- `staging/`: a second WP install used as a staging snapshot
+### 2) Create the database + import the dump
 
-The main “project surfaces” are the standard WordPress customization areas:
+This repo ships with a DB dump: `u942215055_mnvxE.sql`.
 
-- `wp-content/themes/` (theme and presentation)
-- `wp-content/plugins/` (capabilities)
-- `wp-content/uploads/` (media and plugin-generated assets)
-- `wp-config.php` (runtime configuration)
-- `.htaccess` (rewrite rules + LiteSpeed Cache directives)
+The active config in `wp-config.php` expects:
 
-WordPress core is included on purpose to keep this portfolio self-contained and runnable without an installer.
+- `DB_NAME`: `u942215055_mnvxe`
+- `DB_USER`: `root`
+- `DB_PASSWORD`: empty
+- `DB_HOST`: `127.0.0.1`
 
-## What I chose to version-control (and why)
-
-- I included a database dump (`u942215055_mnvxE.sql`) so the content and configuration can be reviewed in-context.
-- I intentionally keep uploads tracked so the portfolio is visually complete.
-- I ignore new SQL exports by default (see `.gitignore`) to prevent accidental large commits.
-
-## Theme & design approach
-
-### Themes present in this repo
-
-- `wp-content/themes/yuki/` — primary theme
-- `wp-content/themes/yuki-blogger/` — Yuki-based variant with blogger-oriented defaults
-- `staging/wp-content/themes/creativ-education/` — alternate staging direction for an education-focused look
-
-### How I implemented design (no-code/low-code first)
-
-This build is intentionally “realistic WordPress work”: the design is driven primarily through WordPress configuration rather than bespoke frontend code.
-
-- Theme Customizer / theme options (typography, color, layout, header/footer builders)
-- Menus and widgets for navigation and layout composition
-- Block editor for page/post layouts and reusable components
-
-### Design options I considered and kept open
-
-- Brand/identity: logo, fonts, color palette
-- Layout strategy: sidebar vs full-width, grid vs list archive views
-- Homepage approach: editorial feed vs a structured landing page
-- Accessibility baseline: contrast, heading hierarchy, alt-text workflow
-
-## Plugin stack (capabilities)
-
-I integrated a pragmatic plugin set to cover the core needs of a public-facing portfolio/blog:
-
-- `wp-content/plugins/all-in-one-seo-pack/` — SEO (sitemaps, metadata, indexing helpers)
-- `wp-content/plugins/google-analytics-for-wordpress/` — analytics
-- `wp-content/plugins/wpforms-lite/` — forms
-- `wp-content/plugins/wpconsent-cookies-banner-privacy-suite/` — cookie consent
-- `wp-content/plugins/litespeed-cache/` — caching/performance
-- `wp-content/plugins/optinmonster/` — marketing/lead capture tooling
-- `wp-content/plugins/userfeedback-lite/` — feedback/surveys (see troubleshooting note)
-
-Host-managed plugins are present but disabled for local stability:
-
-- `wp-content/plugins/hostinger.disabled/`
-- `wp-content/plugins/hostinger-ai-assistant.disabled/`
-
-Staging notes:
-
-- `staging/wp-content/plugins/` includes Contact Form 7 in addition to the root plugin set.
-- `wp-content/mu-plugins/hostinger-auto-updates.php` reflects a Hostinger-managed environment.
-
-## Performance & caching strategy
-
-- `.htaccess` contains LiteSpeed Cache markers and standard WordPress rewrite rules.
-- `wp-content/object-cache.php` is present for LiteSpeed object cache integration.
-
-The caching posture can be dialed depending on hosting constraints:
-
-- Page cache only (simpler, broad compatibility)
-- Page + object cache (more performance headroom)
-- CDN layer (best for global audiences)
-
-## SEO & analytics posture
-
-- `llms.txt` is generated by the SEO plugin and represents a modern “indexability support” artifact.
-- Sitemaps are managed via the SEO stack.
-- Analytics is integrated via MonsterInsights.
-
-## Reproducing the site locally (Windows)
-
-My default local workflow for this repo is XAMPP + MySQL import.
-
-1) Start Apache + MySQL in XAMPP
-
-2) Import the DB dump
+CLI import example:
 
 ```bat
-cd /d D:\Websites\2024PassionateTeachingJourney
-
-"C:\xampp\mysql\bin\mysql.exe" -u root -e "CREATE DATABASE IF NOT EXISTS u942215055_mnvxE DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+cd /d D:\Websites\033-2024-PassionateTeachingJourney.com
 
 "C:\xampp\mysql\bin\mysql.exe" -u root -e "CREATE DATABASE IF NOT EXISTS u942215055_mnvxe DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 "C:\xampp\mysql\bin\mysql.exe" -u root --max_allowed_packet=256M u942215055_mnvxe < u942215055_mnvxE.sql
 ```
 
-3) Confirm `wp-config.php` DB values match the local MySQL instance (`DB_HOST` is set to `127.0.0.1` in this repo)
+If you prefer phpMyAdmin: create the DB named `u942215055_mnvxe`, then import the SQL file.
 
-4) Open the site
+### 3) Point Apache at the repo
 
-- This workspace includes a VS Code task in `.vscode/tasks.json` that opens `http://2024passionateteachingjourney.localhost/`.
-- A simple path-based URL also works (e.g., `http://localhost/2024PassionateTeachingJourney/`) depending on local Apache configuration.
+Two common approaches:
 
-Alternative local environments I can use for the same repo shape:
+- **VirtualHost** (recommended): set the document root to this repo folder.
+- **Path-based**: place the repo under your Apache web root and access via a path URL.
 
-- LocalWP
-- Docker
-- WAMP/Laragon
+This workspace includes a VS Code task that opens:
 
-The main portability constraint is WordPress’s stored absolute URLs, which typically require a serialized-safe search/replace when the domain changes.
+- `http://2024passionateteachingjourney.localhost/`
 
-## Deployment options I considered (production)
+If you use that exact URL, ensure your hosts/vhost setup resolves it to your local Apache.
 
-This project maps to common WordPress deployment models:
+### 4) Fix the site URL (only if your local domain differs)
 
-- Shared hosting (Hostinger-style): fastest path, tradeoff is more host-specific behavior
-- VPS / managed WP: better control over caching, backups, and CI/CD-style workflows
-- “Git-first WordPress”: committing `wp-content/` and using Composer/tooling for core (best engineering workflow, but less "single repo snapshot" convenient)
+WordPress stores absolute URLs in the database (and sometimes serialized data).
 
-I kept the “full WordPress snapshot” approach here to make the portfolio reproducible with minimal external setup.
+Minimal fix (often enough) is updating `home` + `siteurl`:
 
-## Operational notes & troubleshooting
+```sql
+UPDATE wp_options SET option_value = 'http://YOUR-LOCAL-URL' WHERE option_name IN ('home','siteurl');
+```
 
-### Large SQL import errors
+If content/widgets/builders contain serialized URLs, use a **serialized-safe** search/replace (WP-CLI is the cleanest):
 
-If the DB import hits packet limits, I increase `max_allowed_packet` in XAMPP’s MySQL/MariaDB config and restart MySQL.
+```bash
+wp search-replace "https://OLD-DOMAIN" "http://YOUR-LOCAL-URL" --all-tables --precise
+```
 
-### Known issue: UserFeedback Lite fatal error
+## Repo layout
 
-`wp-content/debug.log` captures a production-side fatal error where `userfeedback-lite` expected a file that wasn’t present. In a local environment, I resolve this by disabling the plugin (renaming its folder) so the site can boot cleanly.
+This repository contains **two WordPress installs**:
 
-## Security & privacy notes
+- `/` (root): primary copy
+- `staging/`: a separate WordPress copy used as a staging snapshot for safe iteration
 
-- `wp-config.php` and `staging/wp-config.php` contain WordPress salts/keys as checked in. For a public deployment, I rotate these and prefer environment-driven secrets.
-- The database dump may include user data and URLs; I treat it as sensitive and don’t publish it publicly without sanitizing.
+The main developer touchpoints:
 
-## What I’d do next (if this were a long-lived engineering repo)
+- `wp-content/themes/` — theme(s) and presentation
+- `wp-content/plugins/` — site capabilities
+- `wp-content/uploads/` — media (tracked so the portfolio renders correctly)
+- `wp-config.php` — runtime configuration
+- `.htaccess` — rewrite rules and LiteSpeed Cache directives
 
-- Move toward a “wp-content only” repo layout plus environment-specific configuration.
-- Add WP-CLI scripts for consistent URL search/replace and environment provisioning.
-- Formalize a content migration story (staging → production) and backups.
+WordPress core is included on purpose to keep the repo runnable without external downloads.
+
+## Themes
+
+Themes included:
+
+- `wp-content/themes/yuki/` — primary theme
+- `wp-content/themes/yuki-blogger/` — Yuki-based variant with blogger-oriented defaults
+- `staging/wp-content/themes/creativ-education/` — alternate staging direction
+
+Most “development work” for this site is configuration-driven:
+
+- WordPress Customizer / theme options
+- Block editor templates and reusable blocks
+- Menus/widgets/navigation composition
+
+## Plugins (capabilities)
+
+Representative plugin stack:
+
+- `wp-content/plugins/all-in-one-seo-pack/` — SEO
+- `wp-content/plugins/google-analytics-for-wordpress/` — analytics (MonsterInsights)
+- `wp-content/plugins/wpforms-lite/` — forms
+- `wp-content/plugins/wpconsent-cookies-banner-privacy-suite/` — cookie consent
+- `wp-content/plugins/litespeed-cache/` — caching/performance
+- `wp-content/plugins/optinmonster/` — marketing/lead capture
+- `wp-content/plugins/userfeedback-lite/` — feedback/surveys
+
+Host-managed plugins are kept disabled for local stability:
+
+- `wp-content/plugins/hostinger.disabled/`
+- `wp-content/plugins/hostinger-ai-assistant.disabled/`
+
+Note: `wp-content/mu-plugins/hostinger-auto-updates.php` reflects a Hostinger-managed environment.
+
+## Caching & performance notes
+
+- `.htaccess` contains LiteSpeed Cache markers + WordPress rewrite rules.
+- `wp-content/object-cache.php` exists for object-cache integration.
+
+For development, if you see “stale” pages:
+
+- Disable LiteSpeed Cache temporarily, or clear all caches in the plugin UI.
+- Consider disabling object cache while actively changing themes/templates.
+
+## Troubleshooting
+
+### Large SQL import fails
+
+If import fails due to size/packet limits, increase MySQL/MariaDB `max_allowed_packet` (or use the CLI import example above which sets a higher packet limit for the session).
+
+### Site white-screens / fatal errors
+
+- Check `wp-content/debug.log` (if enabled) and your web server error log.
+- Quick isolation tactic: temporarily disable a plugin by renaming its folder under `wp-content/plugins/`.
+
+Known issue (historical): `userfeedback-lite` has produced a fatal error when expecting a missing file. If you hit that locally, disable the plugin by renaming `wp-content/plugins/userfeedback-lite/`.
+
+### Can’t log into wp-admin
+
+Credentials are not documented in this repo.
+
+Options:
+
+- Use WP-CLI to reset a password (preferred):
+  - `wp user list`
+  - `wp user update <id> --user_pass="new-password"`
+- Or reset via the database (WordPress will re-hash on next login for legacy MD5 resets):
+
+```sql
+UPDATE wp_users SET user_pass = MD5('new-password') WHERE user_login = 'your-username';
+```
+
+## Staging workflow
+
+`staging/` is a second WordPress install used for experimentation.
+
+- It currently points at the **same database configuration** as root.
+- If you want it fully isolated, give staging its own DB name and import a separate copy of the dump.
+
+## What’s version-controlled (and why)
+
+- Database dump: `u942215055_mnvxE.sql` (to review the site in-context)
+- Uploads: tracked so the site renders visually complete
+
+Note: `.gitignore` ignores `*.sql` to prevent accidental new exports, but already-tracked dumps remain in the repo.
+
+## Security & privacy
+
+- Treat this as a **portfolio snapshot**, not a hardened production configuration.
+- The DB dump can contain URLs, emails, and other content data. Avoid making the repository public unless you sanitize/remove the dump and move any sensitive runtime configuration out of version control.
+
+## Production / deployment notes
+
+This repo is optimized for **reproducibility**, not for long-lived operations.
+
+If you were to run this as a maintained engineering project, a more standard approach is:
+
+- Version-control `wp-content/` only
+- Manage core/plugins via tooling (Composer/Bedrock/WP-CLI) and environment-specific config
+- Keep secrets out of git (environment variables / host secret manager)
